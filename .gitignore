@@ -388,4 +388,4 @@ FodyWeavers.xsd
 *.sln.iml
 
 # Include all third party data
-!ModelViewer/Third_Party/**
+!MSA-SMT/Third_Party/**
