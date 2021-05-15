@@ -37,7 +37,7 @@ struct Output {
     bool isSAT = false;
 
     // Output in terms of numbers (2D array)
-    std::vector<std::vector<int>> rawOutput = {};
+    std::vector<std::vector<int>> encodedOutput = {};
 
     // Output in terms of characters (2D array)
     std::vector<std::vector<char>> decodedOutput = {};

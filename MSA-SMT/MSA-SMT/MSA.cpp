@@ -8,8 +8,12 @@
 namespace 
 {
     // Hardcoded input for now
-    const char* tempInput[3] = { "CGTCGCCACCGCCGGCTACGACAAC", "CGTCGCCACCGCCGGCTACGATAAC", "CGTCGTCACCGCCGGCTACGACAAC" };
-    const int k = 27;
+    //const char* tempInput[3] = { "CGTCGCCACCGCCGGCTACGACAAC", "CGTCGCCACCGCCGGCTACGATAAC", "CGTCGTCACCGCCGGCTACGACAAC" };
+    //const int k = 27;
+    const char* tempInput[3] = { "AAAGT", "AAGT", "GAAGT" };
+    const int k = 6;
+
+
 
     // Helper function to retrieve a symbol from an array of symbols
     z3::expr GetSymbol(const std::vector<z3::expr>& symbols, const Input& input, const int r, const int c) {
@@ -190,7 +194,7 @@ void MSAMethod2(const Input& input, Output& output)
         z3::model m = s.get_model();
 
         for (int row = 0; row < input.m; ++row) {
-            std::vector<int> rawOutputRow = {};
+            std::vector<int> encodedOutputRow = {};
             std::vector<char> decodedOutputRow = {};
 
             for (int col = 0; col < input.k; ++col) {
@@ -201,9 +205,9 @@ void MSAMethod2(const Input& input, Output& output)
                     z3::func_decl v = m[i];
                     if (v.name().str().compare(name) == 0) {
 
-                        // Get the raw value
+                        // Get the raw output
                         int val = m.get_const_interp(v).get_numeral_int();
-                        rawOutputRow.push_back(val);
+                        encodedOutputRow.push_back(val);
 
                         // (Post-processing) Check if this char even exists in the input, if not, replace with a "-"
                         const std::vector<int>& inputRow = input.encodedInput[row];
@@ -220,7 +224,7 @@ void MSAMethod2(const Input& input, Output& output)
             }
 
             // Push this row onto the output
-            output.rawOutput.push_back(rawOutputRow);
+            output.encodedOutput.push_back(encodedOutputRow);
             output.decodedOutput.push_back(decodedOutputRow);
         }
     }
@@ -237,6 +241,14 @@ void printInput(const Input& input)
     for (auto it : input.rawInput) {
         printf("%s\n", it);
     }
+
+    printf("\nEncoded Input:\n");
+    for (const std::vector<int>& it : input.encodedInput) {
+        for (auto val : it) {
+            printf("%d ", val);
+        }
+        printf("\n");
+    }
 }
 
 
@@ -244,13 +256,13 @@ void printOutput(const Output& output)
 {
     if (output.isSAT) {
 
-        /*printf("\nRaw Output:\n");
-        for (const std::vector<int>& it : output.rawOutput) {
+        printf("\nEncoded Output:\n");
+        for (const std::vector<int>& it : output.encodedOutput) {
             for (auto val : it) {
                 printf("%d ", val);
             }
             printf("\n");
-        }*/
+        }
 
         printf("\nDecoded Output:\n");
         for (const std::vector<char>& it : output.decodedOutput) {
