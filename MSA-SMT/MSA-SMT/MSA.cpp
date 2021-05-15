@@ -13,8 +13,6 @@ namespace
     const char* tempInput[3] = { "AAAGT", "AAGT", "GAAGT" };
     const int k = 6;
 
-
-
     // Helper function to retrieve a symbol from an array of symbols
     z3::expr GetSymbol(const std::vector<z3::expr>& symbols, const Input& input, const int r, const int c) {
         return symbols.at(r * input.k + c);
@@ -35,16 +33,27 @@ void getInput(Input& input)
         input.n.push_back(length);
     }
 
+    // Store the max length
     input.k = k;
 
-    // Compute unique chars
+    // Compute unique chararcters
     for (auto it : input.rawInput) {
         for (int i = 0; i < strlen(it); ++i) {
             input.uniqueChars.insert(it[i]);
         }
     }
     input.base = (int)input.uniqueChars.size() + 1;
+}
 
+
+
+
+
+
+#pragma region Method2
+
+void encodeInput2(Input& input)
+{
     // Build the encoding and decoding maps
     input.encoding.insert(std::pair<char, int>('-', 0));
     input.decoding.insert(std::pair<int, char>(0, '-'));
@@ -235,6 +244,87 @@ void MSAMethod2(const Input& input, Output& output)
     }
 }
 
+#pragma endregion Kyles Optimized method
+
+
+
+
+
+#pragma region Method3
+
+void encodeInput3(Input& input)
+{
+    // Build the encoding and decoding maps
+    // Map each unique character to a unique value
+    input.encoding.insert(std::pair<char, int>('-', 0));
+    input.decoding.insert(std::pair<int, char>(0, '-'));
+    int code = 1;
+    for (auto it : input.uniqueChars) {
+        input.encoding.insert(std::pair<char, int>(it, code));
+        input.decoding.insert(std::pair<int, char>(code, it));
+        code++;
+    }
+
+    // Build an encoded input vector
+    for (auto it : input.rawInput) {
+        std::vector<int> row = {};
+        for (int i = 0; i < strlen(it); ++i) {
+            const int encodedValue = input.encoding.at(it[i]);
+            row.push_back(encodedValue);
+        }
+        input.encodedInput.push_back(row);
+    }
+}
+
+void MSAMethod3(const Input& input, Output& output)
+{
+    z3::context c;
+    z3::set_param("parallel.enable", true);
+
+    // Define symbols
+    z3::expr symbol1 = c.int_const("s1");
+    z3::expr symbol2 = c.int_const("s2");
+
+    // Declare solver
+    z3::solver s(c);
+
+    // Define constraints
+    s.add(symbol1 > symbol2);
+    s.add(symbol1 + symbol2 == 15);
+    
+    // Run the solver
+    const z3::check_result result = s.check();
+    if (result == z3::sat)
+    {
+        // There is a solution
+        output.isSAT = true;
+
+        // View the model
+        z3::model m = s.get_model();
+
+       // Enumerate and print the variables
+        for (uint32_t i = 0; i < m.size(); ++i) {
+            z3::func_decl v = m[i];
+            std::cout << "\n" << v.name() << ": " << m.get_const_interp(v);
+        }
+        std::cout << "\n";
+
+        // TODO: Decode the variables and add them to the output
+    }
+    else
+    {
+        // No solution :(
+        output.isSAT = false;
+    }
+}
+
+#pragma endregion Linear Programming method
+
+
+
+
+
+
 void printInput(const Input& input)
 {
     printf("Input:\n");
@@ -250,7 +340,6 @@ void printInput(const Input& input)
         printf("\n");
     }
 }
-
 
 void printOutput(const Output& output)
 {

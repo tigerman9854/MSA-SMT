@@ -43,7 +43,17 @@ struct Output {
     std::vector<std::vector<char>> decodedOutput = {};
 };
 
+
+
 void getInput(Input& input);
 void printInput(const Input& input);
+
+// Method 2
+void encodeInput2(Input& input);
 void MSAMethod2(const Input& input, Output& output);
+
+// Method 3
+void encodeInput3(Input& input);
+void MSAMethod3(const Input& input, Output& output);
+
 void printOutput(const Output& output);
