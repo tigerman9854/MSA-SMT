@@ -1,0 +1,266 @@
+#include "MSA.h"
+#include "z3++.h"
+
+#include "stdio.h"
+#include <algorithm> // std::find
+
+
+namespace 
+{
+    // Hardcoded input for now
+    const char* tempInput[3] = { "CGTCGCCACCGCCGGCTACGACAAC", "CGTCGCCACCGCCGGCTACGATAAC", "CGTCGTCACCGCCGGCTACGACAAC" };
+    const int k = 27;
+
+    // Helper function to retrieve a symbol from an array of symbols
+    z3::expr GetSymbol(const std::vector<z3::expr>& symbols, const Input& input, const int r, const int c) {
+        return symbols.at(r * input.k + c);
+    }
+}
+
+void getInput(Input& input)
+{
+    // TODO: Implement some way to ask the user for input
+
+    // Store the sequences
+    input.m = (int)(sizeof(tempInput) / sizeof(tempInput[0]));
+    for (int i = 0; i < input.m; ++i) {
+        const char* sequence = tempInput[i];
+        const int length = (int)strlen(sequence);
+
+        input.rawInput.push_back(sequence);
+        input.n.push_back(length);
+    }
+
+    input.k = k;
+
+    // Compute unique chars
+    for (auto it : input.rawInput) {
+        for (int i = 0; i < strlen(it); ++i) {
+            input.uniqueChars.insert(it[i]);
+        }
+    }
+    input.base = (int)input.uniqueChars.size() + 1;
+
+    // Build the encoding and decoding maps
+    input.encoding.insert(std::pair<char, int>('-', 0));
+    input.decoding.insert(std::pair<int, char>(0, '-'));
+    int code = 1;
+    for (auto it : input.uniqueChars) {
+        input.encoding.insert(std::pair<char, int>(it, code));
+        input.decoding.insert(std::pair<int, char>(code, it));
+        code++;
+    }
+
+    // Build an encoded input vector
+    for (auto it : input.rawInput) {
+        std::vector<int> row = {};
+        for (int i = 0; i < strlen(it); ++i) {
+            const int encodedValue = i * input.base + input.encoding.at(it[i]);
+            row.push_back(encodedValue);
+        }
+        input.encodedInput.push_back(row);
+    }
+}
+
+void MSAMethod2(const Input& input, Output& output)
+{
+    z3::context c;
+    z3::set_param("parallel.enable", true);
+
+    // Build a 2D array of symbols
+    std::vector<z3::expr> symbols;
+    for (int row = 0; row < input.m; ++row) {
+        for (int col = 0; col < input.k; ++col) {
+            char name[24] = {};
+            snprintf(name, 24, "S_%d_%d", row, col);
+            const z3::expr x = c.int_const(name);
+            symbols.push_back(x);
+        }
+    }
+
+    z3::solver s(c);
+
+    // 1. Domain constraints (tight domain) (sometimes faster)
+    for (int row = 0; row < input.m; ++row) {
+        const int blanks = input.k - input.n[row];
+        for (int col = 0; col < input.k; ++col) {
+            const z3::expr& thisSymbol = GetSymbol(symbols, input, row, col);
+            z3::expr thisDomain = (thisSymbol != thisSymbol); // Something false
+
+            for (int inputCol = std::max(col - blanks, 0); inputCol <= std::min(input.n[row] - 1, col); ++inputCol) {
+                const int inputVal = input.encodedInput.at(row).at(inputCol);
+
+                thisDomain = (thisDomain || thisSymbol == inputVal);
+            }
+
+            for (int blankCol = std::max(col - blanks + 1, 0); blankCol <= col; ++blankCol) {
+                const int blankVal = blankCol * input.base;
+                thisDomain = (thisDomain || thisSymbol == blankVal);
+            }
+
+            s.add(thisDomain);
+        }
+    }
+
+    // Loose domain (sometimes slower)
+    /*for (z3::expr& it : symbols) {
+        s.add(it >= 0 && it <= input.base * input.k);
+    }*/
+
+    // 2. Alignment constraints
+    for (int col = 0; col < input.k; ++col) {
+        for (int row = 0; row < input.m; ++row) {
+            const z3::expr& thisSymbol = GetSymbol(symbols, input, row, col);
+
+            z3::expr thisSymbolsConstraints = (thisSymbol == thisSymbol); // Something true
+
+            for (int row2 = 0; row2 < input.m; ++row2) {
+                if (row == row2) {
+                    continue;
+                }
+                else {
+                    const z3::expr& otherSymbol = GetSymbol(symbols, input, row2, col);
+                    const z3::expr conjecture = ((thisSymbol % input.base) == (otherSymbol % input.base) || (otherSymbol % input.base) == 0);
+                    thisSymbolsConstraints = (thisSymbolsConstraints && conjecture);
+                }
+            }
+            thisSymbolsConstraints = (thisSymbolsConstraints || thisSymbol % input.base == 0);
+            s.add(thisSymbolsConstraints);
+        }
+    }
+
+    // 3. Increasing
+    for (int row = 0; row < input.m; ++row) {
+        for (int col = 1; col < input.k; ++col) {
+            const z3::expr& thisSymbol = GetSymbol(symbols, input, row, col);
+            const z3::expr& lastSymbol = GetSymbol(symbols, input, row, col - 1);
+
+            // Increasing not required for 2 blanks in a row
+            // This constraint makes it much slower, but is necessary :(
+            const z3::expr multiBlanks = (thisSymbol % input.base == 0 && thisSymbol == lastSymbol);
+            s.add(thisSymbol > lastSymbol || multiBlanks);
+        }
+    }
+
+    // 4. One of each input per row
+    for (int row = 0; row < input.m; ++row) {
+        for (int it : input.encodedInput[row])
+        {
+            z3::expr thisInputCharsConstraints = (GetSymbol(symbols, input, row, 0) < 0); // Something false
+
+            // More constraints (sometimes faster)
+            for (int col = 0; col < input.k; ++col) {
+                const z3::expr& thisSymbol = GetSymbol(symbols, input, row, col);
+
+                z3::expr thisPermuationsConstraints = (thisSymbol == it);
+
+                for (int col2 = 0; col2 < input.k; ++col2) {
+                    if (col == col2) {
+                        continue;
+                    }
+
+                    const z3::expr& otherSymbol = GetSymbol(symbols, input, row, col2);
+
+                    thisPermuationsConstraints = (thisPermuationsConstraints && otherSymbol != it);
+                }
+
+                thisInputCharsConstraints = (thisInputCharsConstraints || thisPermuationsConstraints);
+            }
+
+            // Less constraints (sometimes faster)
+            /*for (int col = 0; col < input.k; ++col) {
+                const z3::expr& thisSymbol = GetSymbol(symbols, input, row, col);
+
+                z3::expr thisPermuationsConstraints = (thisSymbol == it);
+                thisInputCharsConstraints = (thisInputCharsConstraints || thisPermuationsConstraints);
+            }*/
+
+            s.add(thisInputCharsConstraints);
+        }
+    }
+
+
+    // 5. Postprocessing and results
+    const z3::check_result result = s.check();
+    if (result == z3::sat)
+    {
+        output.isSAT = true;
+
+        // Retrieve the output characters
+        z3::model m = s.get_model();
+
+        for (int row = 0; row < input.m; ++row) {
+            std::vector<int> rawOutputRow = {};
+            std::vector<char> decodedOutputRow = {};
+
+            for (int col = 0; col < input.k; ++col) {
+                char name[24] = {};
+                snprintf(name, 24, "S_%d_%d", row, col);
+
+                for (uint32_t i = 0; i < m.size(); ++i) {
+                    z3::func_decl v = m[i];
+                    if (v.name().str().compare(name) == 0) {
+
+                        // Get the raw value
+                        int val = m.get_const_interp(v).get_numeral_int();
+                        rawOutputRow.push_back(val);
+
+                        // (Post-processing) Check if this char even exists in the input, if not, replace with a "-"
+                        const std::vector<int>& inputRow = input.encodedInput[row];
+                        if (std::find(inputRow.begin(), inputRow.end(), val) == inputRow.end()) {
+                            val = 0;
+                        }
+
+                        // Decode the output value
+                        const int outputVal = val % input.base;
+                        const char outputChar = input.decoding.at(outputVal);
+                        decodedOutputRow.push_back(outputChar);
+                    }
+                }
+            }
+
+            // Push this row onto the output
+            output.rawOutput.push_back(rawOutputRow);
+            output.decodedOutput.push_back(decodedOutputRow);
+        }
+    }
+    else
+    {
+        // No solution :(
+        output.isSAT = false;
+    }
+}
+
+void printInput(const Input& input)
+{
+    printf("Input:\n");
+    for (auto it : input.rawInput) {
+        printf("%s\n", it);
+    }
+}
+
+
+void printOutput(const Output& output)
+{
+    if (output.isSAT) {
+
+        /*printf("\nRaw Output:\n");
+        for (const std::vector<int>& it : output.rawOutput) {
+            for (auto val : it) {
+                printf("%d ", val);
+            }
+            printf("\n");
+        }*/
+
+        printf("\nDecoded Output:\n");
+        for (const std::vector<char>& it : output.decodedOutput) {
+            for (auto val : it) {
+                printf("%c", val);
+            }
+            printf("\n");
+        }
+    }
+    else {
+        printf("\nNo solution.\n");
+    }
+}
