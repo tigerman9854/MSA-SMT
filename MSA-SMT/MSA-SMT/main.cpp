@@ -1,7 +1,7 @@
 #include "MSA.h"
 
 // Change this value to switch between methods
-const int method = 3;
+const int method = 2;
 
 int main()
 {

@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSA-SMT", "MSA-SMT\MSA-SMT.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSA-UI", "MSA-UI\MSA-UI.vcxproj", "{6CCF23F6-2760-47F0-928A-FF4C93856405}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSA-SMT-LIB", "MSA-SMT-LIB\MSA-SMT-LIB.vcxproj", "{7908643E-0964-4497-B008-FF037B670433}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -29,6 +31,14 @@ Global
 		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Release|x64.ActiveCfg = Release|x64
 		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Release|x64.Build.0 = Release|x64
 		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Release|x86.ActiveCfg = Release|x64
+		{7908643E-0964-4497-B008-FF037B670433}.Debug|x64.ActiveCfg = Debug|x64
+		{7908643E-0964-4497-B008-FF037B670433}.Debug|x64.Build.0 = Debug|x64
+		{7908643E-0964-4497-B008-FF037B670433}.Debug|x86.ActiveCfg = Debug|Win32
+		{7908643E-0964-4497-B008-FF037B670433}.Debug|x86.Build.0 = Debug|Win32
+		{7908643E-0964-4497-B008-FF037B670433}.Release|x64.ActiveCfg = Release|x64
+		{7908643E-0964-4497-B008-FF037B670433}.Release|x64.Build.0 = Release|x64
+		{7908643E-0964-4497-B008-FF037B670433}.Release|x86.ActiveCfg = Release|Win32
+		{7908643E-0964-4497-B008-FF037B670433}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
