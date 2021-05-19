@@ -44,7 +44,6 @@ struct Output {
 };
 
 
-
 void getInput(Input& input);
 void printInput(const Input& input);
 

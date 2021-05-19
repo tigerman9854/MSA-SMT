@@ -5,22 +5,30 @@ VisualStudioVersion = 16.0.31229.75
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSA-SMT", "MSA-SMT\MSA-SMT.vcxproj", "{D15D06A5-9CA1-40BD-A3CF-99822515C39C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSA-UI", "MSA-UI\MSA-UI.vcxproj", "{6CCF23F6-2760-47F0-928A-FF4C93856405}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x64.ActiveCfg = Release|x64
-		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x64.Build.0 = Release|x64
 		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Debug|x64.ActiveCfg = Debug|x64
 		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Debug|x64.Build.0 = Debug|x64
-		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x86.ActiveCfg = Debug|Win32
-		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x86.Build.0 = Debug|Win32
 		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Debug|x86.ActiveCfg = Release|Win32
 		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Debug|x86.Build.0 = Release|Win32
+		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x64.ActiveCfg = Release|x64
+		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x64.Build.0 = Release|x64
+		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x86.ActiveCfg = Debug|Win32
+		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x86.Build.0 = Debug|Win32
+		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Debug|x64.ActiveCfg = Debug|x64
+		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Debug|x64.Build.0 = Debug|x64
+		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Debug|x86.ActiveCfg = Debug|x64
+		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Release|x64.ActiveCfg = Release|x64
+		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Release|x64.Build.0 = Release|x64
+		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

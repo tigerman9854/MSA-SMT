@@ -276,21 +276,66 @@ void encodeInput3(Input& input)
     }
 }
 
+struct Edge {
+    Edge(const z3::expr& sym) : symbol(sym) 
+    { }
+
+    z3::expr symbol;
+    std::pair<int, int> start;
+    std::pair<int, int> end;
+    int startChar = 0;
+    int endChar = 0;
+};
+
 void MSAMethod3(const Input& input, Output& output)
 {
     z3::context c;
     z3::set_param("parallel.enable", true);
 
     // Define symbols
-    z3::expr symbol1 = c.int_const("s1");
-    z3::expr symbol2 = c.int_const("s2");
+    std::vector<Edge> edges;
+    for (int row = 0; row < input.m; ++row) {
+        for (int col = 0; col < input.n[row]; ++col) {
+            // For each input symbol
+            const int thisSymbol = input.encodedInput[row][col];
+            
+            // Loop through all symbols in all later rows
+            for (int row2 = row + 1; row2 < input.m; ++row2) {
+                for (int col2 = 0; col2 < input.n[row2]; ++col2) {
+                    // Create an edge if the symbols match
+                    const int otherSymbol = input.encodedInput[row2][col2];
+
+                    if (thisSymbol == otherSymbol) {
+                        char name[32] = {};
+                        snprintf(name, 32, "S_%d_%d__%d_%d", row, col, row2, col2);
+
+                        Edge e(c.bool_const(name));
+                        e.start = std::make_pair(row, col);
+                        e.end = std::make_pair(row2, col2);
+                        e.startChar = thisSymbol;
+                        e.endChar = otherSymbol;
+
+                        edges.push_back(e);
+                    }
+                }
+            }
+        }
+    }
 
     // Declare solver
     z3::solver s(c);
 
     // Define constraints
-    s.add(symbol1 > symbol2);
-    s.add(symbol1 + symbol2 == 15);
+
+    // 0. No critical cycles
+
+
+
+    // 1. Pick only 1 edge from each char to each row
+
+    // 2. Edges cannot cross
+
+    // 3. Objective
     
     // Run the solver
     const z3::check_result result = s.check();
