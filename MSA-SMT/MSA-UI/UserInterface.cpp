@@ -107,6 +107,7 @@ AlignmentWindow::AlignmentWindow(AlignmentInfo& info, QWidget* parent) : QWidget
 	QTextEdit* pInputEdit = new QTextEdit(this);
 	pInputEdit->setReadOnly(true);
 	QTextEdit* pOutputEdit = new QTextEdit(this);
+	pOutputEdit->setReadOnly(true);
 
 	// Create buttons
 	QPushButton* pDoneButton = new QPushButton("Done", this);
@@ -133,7 +134,7 @@ AlignmentWindow::AlignmentWindow(AlignmentInfo& info, QWidget* parent) : QWidget
 	std::vector<std::vector<char>> filteredInput;
 	for (QString& it : seq) {
 		std::vector<char> row;
-		
+
 		for (auto c : it) {
 			if (c == 'A' || c == 'C' || c == 'G' || c == 'T' || c == 'U') {
 				row.push_back(c.toLatin1());
@@ -152,7 +153,23 @@ AlignmentWindow::AlignmentWindow(AlignmentInfo& info, QWidget* parent) : QWidget
 	}
 	pInputEdit->setText(inputText);
 
-	// TODO: Send input to MSA computer
+	// TODO: Do this in another thread
 	Input input;
-	getInput(input);
+	input.rawInput = filteredInput;
+	input.k = info.maxLength;
+	Output output = computeMSA(input, info.tightConstraints);
+
+	// Build into a QString
+	if (output.isSAT)
+	{
+		QString outputText;
+		for (auto it : output.decodedOutput) {
+			for (auto c : it) {
+				outputText += c;
+			}
+			outputText += "\n";
+		}
+
+		pOutputEdit->setText(outputText);
+	}
 }

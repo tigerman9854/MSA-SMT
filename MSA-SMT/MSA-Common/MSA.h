@@ -5,7 +5,7 @@
 
 struct Input {
     // Input sequences
-    std::vector<const char*> rawInput = {};
+    std::vector<std::vector<char>> rawInput = {};
 
     // Encoded input
     std::vector<std::vector<int>> encodedInput = {};
@@ -43,6 +43,8 @@ struct Output {
     std::vector<std::vector<char>> decodedOutput = {};
 };
 
+
+Output computeMSA(Input& input, bool tightConstraints = false, int method = 2);
 
 void getInput(Input& input);
 void printInput(const Input& input);

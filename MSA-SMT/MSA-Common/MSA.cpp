@@ -19,6 +19,38 @@ namespace
     }
 }
 
+Output computeMSA(Input& input, bool tightConstraints, int method)
+{
+    input.m = (int)input.rawInput.size();
+
+    // Pre-process
+    for (auto it : input.rawInput) {  
+        input.n.push_back((int)it.size());
+    } 
+
+    // Compute unique chararcters
+    for (auto it : input.rawInput) {
+        for (char c : it) {
+            input.uniqueChars.insert(c);
+        }
+    }
+    input.base = (int)input.uniqueChars.size() + 1;
+
+    Output output;
+
+    if (method == 2) {
+        encodeInput2(input);
+        MSAMethod2(input, output);
+    }
+    else if (method == 3) {
+        encodeInput3(input);
+        MSAMethod3(input, output);
+    }
+
+    return output;
+}
+
+
 void getInput(Input& input)
 {
     // TODO: Implement some way to ask the user for input
@@ -26,10 +58,15 @@ void getInput(Input& input)
     // Store the sequences
     input.m = (int)(sizeof(tempInput) / sizeof(tempInput[0]));
     for (int i = 0; i < input.m; ++i) {
+        std::vector<char> row;
+
         const char* sequence = tempInput[i];
         const int length = (int)strlen(sequence);
+        for (int j = 0; j < length; ++j) {
+            row.push_back(sequence[j]);
+        }
 
-        input.rawInput.push_back(sequence);
+        input.rawInput.push_back(row);
         input.n.push_back(length);
     }
 
@@ -38,8 +75,8 @@ void getInput(Input& input)
 
     // Compute unique chararcters
     for (auto it : input.rawInput) {
-        for (int i = 0; i < strlen(it); ++i) {
-            input.uniqueChars.insert(it[i]);
+        for (char c : it) {
+            input.uniqueChars.insert(c);
         }
     }
     input.base = (int)input.uniqueChars.size() + 1;
@@ -67,7 +104,7 @@ void encodeInput2(Input& input)
     // Build an encoded input vector
     for (auto it : input.rawInput) {
         std::vector<int> row = {};
-        for (int i = 0; i < strlen(it); ++i) {
+        for (int i = 0; i < it.size(); ++i) {
             const int encodedValue = i * input.base + input.encoding.at(it[i]);
             row.push_back(encodedValue);
         }
@@ -268,7 +305,7 @@ void encodeInput3(Input& input)
     // Build an encoded input vector
     for (auto it : input.rawInput) {
         std::vector<int> row = {};
-        for (int i = 0; i < strlen(it); ++i) {
+        for (int i = 0; i < it.size(); ++i) {
             const int encodedValue = input.encoding.at(it[i]);
             row.push_back(encodedValue);
         }
@@ -374,7 +411,10 @@ void printInput(const Input& input)
 {
     printf("Input:\n");
     for (auto it : input.rawInput) {
-        printf("%s\n", it);
+        for (auto c : it) {
+            printf("%c", c);
+        }
+        printf("\n");
     }
 
     printf("\nEncoded Input:\n");

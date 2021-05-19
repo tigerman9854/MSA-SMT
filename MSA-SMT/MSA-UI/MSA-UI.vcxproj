@@ -64,7 +64,7 @@
       <AdditionalIncludeDirectories>$(SOLUTIONDIR)MSA-SMT;%(AdditionalIncludeDirectories);$(SOLUTIONDIR)MSA-COMMON\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>MSA-SMT.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MSA-SMT-LIB.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SOLUTIONDIR)x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -74,7 +74,7 @@
       <AdditionalIncludeDirectories>$(SOLUTIONDIR)MSA-Common;%(AdditionalIncludeDirectories);$(SOLUTIONDIR)MSA-COMMON\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>MSA-SMT.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>MSA-SMT-LIB.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SOLUTIONDIR)x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
