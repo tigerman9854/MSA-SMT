@@ -2,6 +2,9 @@
 
 #include <QMainWindow>
 #include <QWidget>
+#include <QThread>
+
+#include "MSA.h"
 
 struct AlignmentInfo {
     int maxLength = 0;
@@ -24,4 +27,22 @@ class AlignmentWindow : public QWidget
 
 public:
     AlignmentWindow(AlignmentInfo& info, QWidget* parent = nullptr);
+};
+
+class WorkerThread : public QThread
+{
+    Q_OBJECT
+
+public:
+    WorkerThread::WorkerThread(Input in, QObject* parent = nullptr) : QThread(parent), input(in)
+    { }
+
+signals:
+    void resultReady(Output output);
+
+protected:
+    virtual void run() override;
+
+private:
+    Input input;
 };

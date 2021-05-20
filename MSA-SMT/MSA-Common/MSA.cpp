@@ -19,12 +19,12 @@ namespace
     }
 }
 
-Output computeMSA(Input& input, bool tightConstraints, int method)
+Output computeMSA(Input& input, int method)
 {
     input.m = (int)input.rawInput.size();
 
     // Pre-process
-    for (auto it : input.rawInput) {  
+    for (auto it : input.rawInput) {
         input.n.push_back((int)it.size());
     } 
 

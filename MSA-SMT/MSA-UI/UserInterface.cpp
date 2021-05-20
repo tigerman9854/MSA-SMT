@@ -1,5 +1,4 @@
 #include "UserInterface.h"
-#include "MSA.h"
 
 #include <vector>
 
@@ -15,6 +14,8 @@
 #include <QPushButton>
 #include <QFont>
 #include <QGroupBox>
+#include <QMenuBar>
+#include <QElapsedTimer>
 
 UserInterface::UserInterface(QWidget *parent) : QMainWindow(parent)
 {
@@ -43,6 +44,7 @@ UserInterface::UserInterface(QWidget *parent) : QMainWindow(parent)
 	QCheckBox* pTightConstraintCheckBox = new QCheckBox("Tight Constraints", pCentralWidget);
 	pTightConstraintCheckBox->setToolTip("When enabled, creates much tighter constraints for the solver. May run faster in some cases.");
 	QTextEdit* pInputEdit = new QTextEdit(pCentralWidget);
+	pInputEdit->setFontFamily("Courier New");
 
 	// Buttons
 	QPushButton* pAlignButton = new QPushButton("Align", pCentralWidget);
@@ -71,6 +73,23 @@ UserInterface::UserInterface(QWidget *parent) : QMainWindow(parent)
 	pMainLayout->addWidget(pInputBox, 1);
 	pMainLayout->addWidget(pAlignButton, 0, Qt::AlignRight);
 
+	// Menu bar
+	QMenuBar* pMenuBar = new QMenuBar();
+	setMenuBar(pMenuBar);
+
+	// Add default options
+	QMenu* pLoadMenu = pMenuBar->addMenu("Load");
+	pLoadMenu->addAction("Small Example", [=] {
+		pInputEdit->setText("AAAGT,\nAAGT,\nAAAT");
+		pMaxLengthSpinBox->setValue(5);
+		pTightConstraintCheckBox->setChecked(true);
+	});
+	pLoadMenu->addAction("UNSAT Example", [=] {
+		pInputEdit->setText("AAAGTTGCAC,\nAAGTCCGTTC,\nAAATTTGGCG");
+		pMaxLengthSpinBox->setValue(11);
+		pTightConstraintCheckBox->setChecked(true);
+	});
+
 
 	// Interactions
 	connect(pInputEdit, &QTextEdit::textChanged, [=] {
@@ -93,7 +112,7 @@ UserInterface::UserInterface(QWidget *parent) : QMainWindow(parent)
 
 AlignmentWindow::AlignmentWindow(AlignmentInfo& info, QWidget* parent) : QWidget(parent)
 {
-	setWindowTitle("Computing Alignment...");
+	setWindowTitle("Alignment");
 
 	// Create Layout
 	QVBoxLayout* pMainLayout = new QVBoxLayout(this);
@@ -102,30 +121,43 @@ AlignmentWindow::AlignmentWindow(AlignmentInfo& info, QWidget* parent) : QWidget
 	// Create group boxes
 	QGroupBox* pInputBox = new QGroupBox("Input", this);
 	QGroupBox* pOutputBox = new QGroupBox("Output", this);
+	QGroupBox* pStatusBox = new QGroupBox();
 
 	// Create input/output text 
 	QTextEdit* pInputEdit = new QTextEdit(this);
 	pInputEdit->setReadOnly(true);
+	pInputEdit->setFontFamily("Courier New");
 	QTextEdit* pOutputEdit = new QTextEdit(this);
 	pOutputEdit->setReadOnly(true);
+	pOutputEdit->setFontFamily("Courier New");
+
+	// Create status text
+	QLabel* pStatusLabel = new QLabel("Aligning...", pStatusBox);
+	QFont f("Courier New");
+	pStatusLabel->setFont(f);
 
 	// Create buttons
-	QPushButton* pDoneButton = new QPushButton("Done", this);
+	QPushButton* pDoneButton = new QPushButton("Cancel", this);
 	QPushButton* pCopyButton = new QPushButton("Copy", this);
+	pCopyButton->setDisabled(true);
 
 	// Layout
 	pInputBox->setLayout(new QVBoxLayout(this));
 	pOutputBox->setLayout(new QVBoxLayout(this));
+	pStatusBox->setLayout(new QVBoxLayout(this));
 	pInputBox->layout()->addWidget(pInputEdit);
 	pOutputBox->layout()->addWidget(pOutputEdit);
+	pStatusBox->layout()->addWidget(pStatusLabel);
 	pMainLayout->addWidget(pInputBox);
 	pMainLayout->addWidget(pOutputBox);
+	pMainLayout->addWidget(pStatusBox);
 
 	QHBoxLayout* buttonLayout = new QHBoxLayout();
 	buttonLayout->addStretch();
 	buttonLayout->addWidget(pCopyButton);
 	buttonLayout->addWidget(pDoneButton);
 	pMainLayout->addLayout(buttonLayout);
+
 
 	// Parse the info
 	QStringList seq = info.plainText.toUpper().split(',', Qt::SkipEmptyParts);
@@ -140,7 +172,11 @@ AlignmentWindow::AlignmentWindow(AlignmentInfo& info, QWidget* parent) : QWidget
 				row.push_back(c.toLatin1());
 			}
 		}
-		filteredInput.push_back(row);
+		if (row.size() > 0)
+		{
+			// Filter blank rows
+			filteredInput.push_back(row);
+		}
 	}
 
 	// Build into a QString
@@ -153,23 +189,69 @@ AlignmentWindow::AlignmentWindow(AlignmentInfo& info, QWidget* parent) : QWidget
 	}
 	pInputEdit->setText(inputText);
 
-	// TODO: Do this in another thread
+
+	// Create a new thread for computation
 	Input input;
 	input.rawInput = filteredInput;
 	input.k = info.maxLength;
-	Output output = computeMSA(input, info.tightConstraints);
+	input.tightConstraints = info.tightConstraints;
 
-	// Build into a QString
-	if (output.isSAT)
+	WorkerThread* workerThread = new WorkerThread(input, this);
+	connect(workerThread, &WorkerThread::resultReady, this, [=](Output output)
 	{
-		QString outputText;
-		for (auto it : output.decodedOutput) {
-			for (auto c : it) {
-				outputText += c;
+		// Build output into a QString
+		if (output.isSAT)
+		{
+			QString outputText;
+			for (auto it : output.decodedOutput) {
+				for (auto c : it) {
+					outputText += c;
+				}
+				outputText += "\n";
 			}
-			outputText += "\n";
+
+			pOutputEdit->setText(outputText);
+			pCopyButton->setDisabled(false);
+		}
+		else {
+			pOutputEdit->setText("No Alignment!");
 		}
 
-		pOutputEdit->setText(outputText);
-	}
+		// Generate a string to display the timing
+		const double sec = (double)output.nsec * 1e-9;
+		char buffer[32] = {};
+		snprintf(buffer, 32, "Complete (%fs)", sec);
+		pStatusLabel->setText(buffer);
+
+		pDoneButton->setText("Done");
+
+	}, Qt::QueuedConnection);
+	connect(workerThread, &WorkerThread::finished, workerThread, &QObject::deleteLater);
+	workerThread->start();
+
+
+
+
+
+
+	// Button interactions
+	connect(pDoneButton, &QPushButton::pressed, [=] {
+		close();
+	});
+	connect(pCopyButton, &QPushButton::pressed, [=] {
+		pOutputEdit->selectAll();
+		pOutputEdit->copy();
+	});
+}
+
+// Run the MSA in another thread
+void WorkerThread::run() 
+{ 
+	QElapsedTimer timer;
+	timer.start();
+
+	Output output = computeMSA(input);
+
+	output.nsec = timer.nsecsElapsed();
+	emit resultReady(output);
 }

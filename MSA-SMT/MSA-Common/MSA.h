@@ -30,11 +30,17 @@ struct Input {
 
     // Decoding map
     std::map<int, char> decoding = {};
+
+    // Tight constraints
+    bool tightConstraints = false;
 };
 
 struct Output {
     // Whether the input was satisfiable or not
     bool isSAT = false;
+
+    // Time it took to compute
+    int64_t nsec = 0;
 
     // Output in terms of numbers (2D array)
     std::vector<std::vector<int>> encodedOutput = {};
@@ -44,7 +50,7 @@ struct Output {
 };
 
 
-Output computeMSA(Input& input, bool tightConstraints = false, int method = 2);
+Output computeMSA(Input& input, int method = 2);
 
 void getInput(Input& input);
 void printInput(const Input& input);
