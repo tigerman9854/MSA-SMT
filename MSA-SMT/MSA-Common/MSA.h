@@ -4,8 +4,17 @@
 #include <set>
 
 struct Input {
+    // Length we're testing
+    int k = 0;
+
     // Input sequences
     std::vector<std::vector<char>> rawInput = {};
+
+    // Tight constraints
+    bool tightConstraints = false;
+
+
+
 
     // Encoded input
     std::vector<std::vector<int>> encodedInput = {};
@@ -16,8 +25,10 @@ struct Input {
     // Number of sequences
     int m = 0;
 
-    // Length we're testing
-    int k = 0;
+    int maxBlanks = 0;
+
+    // Blanks in each sequence
+    std::vector<int> blanks = {};
 
     // Number of unique characters
     int base = 0;
@@ -30,9 +41,6 @@ struct Input {
 
     // Decoding map
     std::map<int, char> decoding = {};
-
-    // Tight constraints
-    bool tightConstraints = false;
 };
 
 struct Output {
@@ -62,5 +70,13 @@ void MSAMethod2(const Input& input, Output& output);
 // Method 3
 void encodeInput3(Input& input);
 void MSAMethod3(const Input& input, Output& output);
+
+// Method 4
+void encodeInput4(Input& input);
+void MSAMethod4(const Input& input, Output& output);
+
+// Method 5
+void encodeInput5(Input& input);
+void MSAMethod5(const Input& input, Output& output);
 
 void printOutput(const Output& output);

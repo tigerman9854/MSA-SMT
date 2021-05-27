@@ -79,16 +79,32 @@ UserInterface::UserInterface(QWidget *parent) : QMainWindow(parent)
 
 	// Add default options
 	QMenu* pLoadMenu = pMenuBar->addMenu("Load");
-	pLoadMenu->addAction("Small Example", [=] {
+	pLoadMenu->addAction("Small Example (< 1 sec)", [=] {
 		pInputEdit->setText("AAAGT,\nAAGT,\nAAAT");
 		pMaxLengthSpinBox->setValue(5);
 		pTightConstraintCheckBox->setChecked(true);
 	});
-	pLoadMenu->addAction("UNSAT Example", [=] {
+	pLoadMenu->addAction("UNSAT Example (< 1 sec)", [=] {
 		pInputEdit->setText("AAAGTTGCAC,\nAAGTCCGTTC,\nAAATTTGGCG");
 		pMaxLengthSpinBox->setValue(11);
 		pTightConstraintCheckBox->setChecked(true);
 	});
+	pLoadMenu->addAction("Many Sequences (< 1 sec)", [=] {
+		pInputEdit->setText("GCAGCCTGGCCAA,\nGCAGCCTGTGCAA,\nGCAGCCTGGGCAA,\nTCAGCCTGTGCAA,\nTCAGCCTGTGCAA");
+		pMaxLengthSpinBox->setValue(16);
+		pTightConstraintCheckBox->setChecked(true);
+	});
+	pLoadMenu->addAction("Long Example (< 10 sec)", [=] {
+		pInputEdit->setText("ACTGGGTCGCCACAGGTCGGTGA,\nACTGCGTCCCCCGCAGGTCACTGA,\nACTGCGTCCCCGCAGGCCACTGA");
+		pMaxLengthSpinBox->setValue(30);
+		pTightConstraintCheckBox->setChecked(true);
+	});
+	pLoadMenu->addAction("Extra Long Example (< 20 sec)", [=] {
+		pInputEdit->setText("CAGCCTGGCCAACTTCCTCCTGCCCTTTGGCGACAGTGTGTTGA,\nCAGCCTGTGCAACTTCCTCGCGCCGGCGGGCGAGCTGATCCTGA");
+		pMaxLengthSpinBox->setValue(53);
+		pTightConstraintCheckBox->setChecked(true);
+	});
+	
 
 
 	// Interactions
@@ -250,7 +266,7 @@ void WorkerThread::run()
 	QElapsedTimer timer;
 	timer.start();
 
-	Output output = computeMSA(input);
+	Output output = computeMSA(input, 5);
 
 	output.nsec = timer.nsecsElapsed();
 	emit resultReady(output);
