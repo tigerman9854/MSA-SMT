@@ -28,7 +28,7 @@ UserInterface::UserInterface(QWidget *parent) : QMainWindow(parent)
 	pCentralWidget->setLayout(pMainLayout);
 
 	// Labels
-	QLabel* pLengthLabel = new QLabel("Enter the maximum length of the alignment (0=find minimal):", pCentralWidget);
+	QLabel* pLengthLabel = new QLabel("Enter the maximum length of the alignment:", pCentralWidget);
 	QLabel* pInputLabel = new QLabel("Enter sequences separated by commas:", pCentralWidget);
 	QLabel* pTitle = new QLabel("Multiple Sequence Alignment", pCentralWidget);
 	QFont f;
@@ -38,11 +38,12 @@ UserInterface::UserInterface(QWidget *parent) : QMainWindow(parent)
 
 	// Settings
 	QSpinBox* pMaxLengthSpinBox = new QSpinBox(pCentralWidget);
-	pMaxLengthSpinBox->setValue(0);
+	pMaxLengthSpinBox->setValue(10);
 	pMaxLengthSpinBox->setRange(0, 999);
-	pMaxLengthSpinBox->setToolTip("MaxLength=0 solves for the optimal solution, which will take extra time.");
+	pMaxLengthSpinBox->setToolTip("A smaller max length will give a more optimal solution.");
 	QCheckBox* pTightConstraintCheckBox = new QCheckBox("Tight Constraints", pCentralWidget);
-	pTightConstraintCheckBox->setToolTip("When enabled, creates much tighter constraints for the solver. May run faster in some cases.");
+	pTightConstraintCheckBox->setToolTip("When enabled, creates much tighter constraints for the solver. Runs faster in most cases.");
+	pTightConstraintCheckBox->setChecked(true);
 	QTextEdit* pInputEdit = new QTextEdit(pCentralWidget);
 	pInputEdit->setFontFamily("Courier New");
 
@@ -99,12 +100,22 @@ UserInterface::UserInterface(QWidget *parent) : QMainWindow(parent)
 		pMaxLengthSpinBox->setValue(30);
 		pTightConstraintCheckBox->setChecked(true);
 	});
-	pLoadMenu->addAction("Extra Long Example (< 20 sec)", [=] {
-		pInputEdit->setText("CAGCCTGGCCAACTTCCTCCTGCCCTTTGGCGACAGTGTGTTGA,\nCAGCCTGTGCAACTTCCTCGCGCCGGCGGGCGAGCTGATCCTGA");
+	pLoadMenu->addAction("Super Long 2 seq (< 20 sec)", [=] {
+		pInputEdit->setText("CCCATCAGCGGCATCGCCACGTTCAAGGACACCTACGTCGCCACCGCCGGCTACGACAACCAGGTGATCCTCTGGGA,\nCCCATCAGCGGCGTCGCCGCCCACGAGGACTCCTACGTCGCCACCGCCGGTTACGACAACCACGTCATCCTCTGGGA");
+		pMaxLengthSpinBox->setValue(86);
+		pTightConstraintCheckBox->setChecked(true);
+	});
+	pLoadMenu->addAction("Extra Long Example (< 75 sec)", [=] {
+		pInputEdit->setText("CAGCCTGGCCAACTTCCTCCTGCCCTTTGGCGACAGTGTGTTGA,\nCAGCCTGTGCAACTTCCTCGCGCCGGCGGGCGAGCTGATCCTGA,\nCAGCCTGTGCAACTTCCTCCTGCCCTTTGGCGACAGTGTGTTGA");
 		pMaxLengthSpinBox->setValue(53);
 		pTightConstraintCheckBox->setChecked(true);
 	});
-	
+
+	// Fix a bug where this menu wouldn't display properly the first time
+	pLoadMenu->show();
+	pLoadMenu->hide();
+
+
 
 
 	// Interactions
@@ -128,7 +139,8 @@ UserInterface::UserInterface(QWidget *parent) : QMainWindow(parent)
 
 AlignmentWindow::AlignmentWindow(AlignmentInfo& info, QWidget* parent) : QWidget(parent)
 {
-	setWindowTitle("Alignment");
+	const QString title = QString("Alignment k=%1").arg(info.maxLength);
+	setWindowTitle(title);
 
 	// Create Layout
 	QVBoxLayout* pMainLayout = new QVBoxLayout(this);

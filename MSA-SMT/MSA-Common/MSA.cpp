@@ -5,7 +5,7 @@
 #include <algorithm> // std::find
 
 
-namespace 
+namespace
 {
     // Hardcoded input for now
     //const char* tempInput[3] = { "CGTCGCCACCGCCGGCTACGACAAC", "CGTCGCCACCGCCGGCTACGATAAC", "CGTCGTCACCGCCGGCTACGACAAC" };
@@ -322,7 +322,7 @@ void encodeInput3(Input& input)
 }
 
 struct Edge {
-    Edge(const z3::expr& sym) : symbol(sym) 
+    Edge(const z3::expr& sym) : symbol(sym)
     { }
 
     z3::expr symbol;
@@ -343,7 +343,7 @@ void MSAMethod3(const Input& input, Output& output)
         for (int col = 0; col < input.n[row]; ++col) {
             // For each input symbol
             const int thisSymbol = input.encodedInput[row][col];
-            
+
             // Loop through all symbols in all later rows
             for (int row2 = row + 1; row2 < input.m; ++row2) {
                 for (int col2 = 0; col2 < input.n[row2]; ++col2) {
@@ -381,7 +381,7 @@ void MSAMethod3(const Input& input, Output& output)
     // 2. Edges cannot cross
 
     // 3. Objective
-    
+
     // Run the solver
     const z3::check_result result = s.check();
     if (result == z3::sat)
@@ -392,7 +392,7 @@ void MSAMethod3(const Input& input, Output& output)
         // View the model
         z3::model m = s.get_model();
 
-       // Enumerate and print the variables
+        // Enumerate and print the variables
         for (uint32_t i = 0; i < m.size(); ++i) {
             z3::func_decl v = m[i];
             std::cout << "\n" << v.name() << ": " << m.get_const_interp(v);
@@ -443,7 +443,7 @@ void encodeInput4(Input& input)
 
     // Build the encoding and decoding maps
     int code = 0;
-    while(code < input.maxBlanks) {
+    while (code < input.maxBlanks) {
         input.encoding.insert(std::pair<char, int>('-', code));
         input.decoding.insert(std::pair<int, char>(code, '-'));
         code++;
@@ -669,7 +669,7 @@ void MSAMethod5(const Input& input, Output& output)
         }
     }
 
-    // 2. Increasing
+    // 2. Increasing - Each symbol needs to be larger or equal to the previous
     for (int row = 0; row < input.m; ++row) {
         for (int col = 1; col < input.n[row]; ++col) {
             const z3::expr& thisSymbol = symbols[row][col];
@@ -678,14 +678,13 @@ void MSAMethod5(const Input& input, Output& output)
         }
     }
 
-    // 3. Alignment
-    // Each symbol in each row needs to be matched with all equivalent symbols in later rows
+    // 3. Alignment - Each symbol in each row needs to be matched with a symobl in each other row (or a blank)
     for (int row = 0; row < input.m; ++row) {
-        for (int col = 0; col < input.n[row]; ++col)
-        {
+        for (int col = 0; col < input.n[row]; ++col) {
             const z3::expr& thisSymbol = symbols[row][col];
             const char thisSymbolInput = input.rawInput[row][col];
 
+            // TODO: Find some way to eliminate these bogus constraints
             z3::expr thisSymbolsConstraints = (thisSymbol == thisSymbol); // Something true
 
             // In each row, this symbol needs to match at least 1 other 
@@ -694,6 +693,7 @@ void MSAMethod5(const Input& input, Output& output)
                     continue;
                 }
 
+                // TODO: Find some way to eliminate these bogus constraints
                 z3::expr matchingConstraints = (thisSymbol != thisSymbol); // Something false
                 z3::expr noMatchConstraints = (thisSymbol == thisSymbol); // Something true
 
@@ -701,7 +701,15 @@ void MSAMethod5(const Input& input, Output& output)
                     const z3::expr& otherSymbol = symbols[row2][col2];
                     const char otherSymbolInput = input.rawInput[row2][col2];
 
-                    // Only if the symbols are matching
+                    // Tight constraints - Check if these 2 columns are even close enough to be aligned,
+                    // if not, continue.
+                    if (input.tightConstraints) {
+                        if (abs(col - col2) > abs(std::max(input.blanks[row], input.blanks[row2]))) {
+                            continue;
+                        }
+                    }
+
+                    // Either these symbols align (and match)
                     if (thisSymbolInput == otherSymbolInput) {
 
                         // Symbols are aligned by columns
@@ -713,38 +721,6 @@ void MSAMethod5(const Input& input, Output& output)
                     z3::expr noMatch = (thisSymbol + col != otherSymbol + col2);
                     noMatchConstraints = (noMatchConstraints && noMatch);
                 }
-
-                // OR this symbol could match a blank in another row
-                
-
-                // OR this symbol could be blank (WRONG)
-                /*z3::expr thisSymbolBlank = [&] {
-                    if (col == 0) {
-                        return (thisSymbol > 0);
-                    }
-                    else {
-                        const z3::expr& prevSymbol = symbols[row][col - 1];
-                        return (thisSymbol - prevSymbol > 0);
-                    }
-                }();
-
-                thisRowsConstraints = (thisRowsConstraints || thisSymbolBlank);*/
-                 
-                // Other symbol could be blank (NEEDS FIX)
-                /*z3::expr otherSymbolBlank = [&] {
-                    if (col2 == 0) {
-                        return (otherSymbol > 0);
-                    }
-                    else {
-                        const z3::expr& prevSymbol = symbols[row2][col2 - 1];
-                        return (otherSymbol - prevSymbol > 0);
-                    }
-                }();
-
-                // This symbol could be blank (NEEDS FIX)
-
-
-                thisRowsConstraints = (thisRowsConstraints || ((thisSymbolBlank || otherSymbolBlank) && aligned));*/
 
 
                 thisSymbolsConstraints = (thisSymbolsConstraints && (matchingConstraints || noMatchConstraints));
