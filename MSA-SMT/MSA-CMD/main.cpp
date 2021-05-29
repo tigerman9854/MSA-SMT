@@ -1,10 +1,9 @@
 #include "MSA.h"
+#include "stdio.h"
 
 namespace
 {
     // Hardcoded input for now
-    //const char* tempInput[3] = { "CGTCGCCACCGCCGGCTACGACAAC", "CGTCGCCACCGCCGGCTACGATAAC", "CGTCGTCACCGCCGGCTACGACAAC" };
-    //const int k = 27;
     const char* tempInput[3] = { "AAAGT", "AAGT", "GAAGT" };
     const int k = 6;
 
@@ -45,8 +44,8 @@ void getInput(Input& input)
 void printInput(const Input& input)
 {
     printf("Input:\n");
-    for (auto it : input.rawInput) {
-        for (auto c : it) {
+    for (const std::vector<char>& it : input.rawInput) {
+        for (const char c : it) {
             printf("%c", c);
         }
         printf("\n");

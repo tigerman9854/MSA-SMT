@@ -278,7 +278,7 @@ void WorkerThread::run()
 	QElapsedTimer timer;
 	timer.start();
 
-	Output output = computeMSA(input, 5);
+	Output output = computeMSA(input);
 
 	output.nsec = timer.nsecsElapsed();
 	emit resultReady(output);
