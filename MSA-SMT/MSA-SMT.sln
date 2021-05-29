@@ -3,9 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31229.75
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSA-SMT", "MSA-SMT\MSA-SMT.vcxproj", "{D15D06A5-9CA1-40BD-A3CF-99822515C39C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSA-CMD", "MSA-CMD\MSA-CMD.vcxproj", "{D15D06A5-9CA1-40BD-A3CF-99822515C39C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7908643E-0964-4497-B008-FF037B670433} = {7908643E-0964-4497-B008-FF037B670433}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSA-UI", "MSA-UI\MSA-UI.vcxproj", "{6CCF23F6-2760-47F0-928A-FF4C93856405}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7908643E-0964-4497-B008-FF037B670433} = {7908643E-0964-4497-B008-FF037B670433}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MSA-SMT-LIB", "MSA-SMT-LIB\MSA-SMT-LIB.vcxproj", "{7908643E-0964-4497-B008-FF037B670433}"
 EndProject
@@ -19,12 +25,10 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Debug|x64.ActiveCfg = Debug|x64
 		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Debug|x64.Build.0 = Debug|x64
-		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Debug|x86.ActiveCfg = Release|Win32
-		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Debug|x86.Build.0 = Release|Win32
+		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Debug|x86.ActiveCfg = Debug|x64
 		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x64.ActiveCfg = Release|x64
 		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x64.Build.0 = Release|x64
-		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x86.ActiveCfg = Debug|Win32
-		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x86.Build.0 = Debug|Win32
+		{D15D06A5-9CA1-40BD-A3CF-99822515C39C}.Release|x86.ActiveCfg = Release|x64
 		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Debug|x64.ActiveCfg = Debug|x64
 		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Debug|x64.Build.0 = Debug|x64
 		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Debug|x86.ActiveCfg = Debug|x64
@@ -33,12 +37,10 @@ Global
 		{6CCF23F6-2760-47F0-928A-FF4C93856405}.Release|x86.ActiveCfg = Release|x64
 		{7908643E-0964-4497-B008-FF037B670433}.Debug|x64.ActiveCfg = Debug|x64
 		{7908643E-0964-4497-B008-FF037B670433}.Debug|x64.Build.0 = Debug|x64
-		{7908643E-0964-4497-B008-FF037B670433}.Debug|x86.ActiveCfg = Debug|Win32
-		{7908643E-0964-4497-B008-FF037B670433}.Debug|x86.Build.0 = Debug|Win32
+		{7908643E-0964-4497-B008-FF037B670433}.Debug|x86.ActiveCfg = Debug|x64
 		{7908643E-0964-4497-B008-FF037B670433}.Release|x64.ActiveCfg = Release|x64
 		{7908643E-0964-4497-B008-FF037B670433}.Release|x64.Build.0 = Release|x64
-		{7908643E-0964-4497-B008-FF037B670433}.Release|x86.ActiveCfg = Release|Win32
-		{7908643E-0964-4497-B008-FF037B670433}.Release|x86.Build.0 = Release|Win32
+		{7908643E-0964-4497-B008-FF037B670433}.Release|x86.ActiveCfg = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

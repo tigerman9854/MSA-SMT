@@ -61,7 +61,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SOLUTIONDIR)MSA-SMT;%(AdditionalIncludeDirectories);$(SOLUTIONDIR)MSA-COMMON\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(SOLUTIONDIR)MSA-COMMON\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>MSA-SMT-LIB.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -71,7 +71,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SOLUTIONDIR)MSA-Common;%(AdditionalIncludeDirectories);$(SOLUTIONDIR)MSA-COMMON\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SOLUTIONDIR)MSA-Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>MSA-SMT-LIB.lib;%(AdditionalDependencies)</AdditionalDependencies>

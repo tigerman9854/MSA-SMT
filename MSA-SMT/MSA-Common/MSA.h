@@ -60,9 +60,6 @@ struct Output {
 
 Output computeMSA(Input& input, int method = 2);
 
-void getInput(Input& input);
-void printInput(const Input& input);
-
 // Method 2
 void encodeInput2(Input& input);
 void MSAMethod2(const Input& input, Output& output);
@@ -78,5 +75,3 @@ void MSAMethod4(const Input& input, Output& output);
 // Method 5
 void encodeInput5(Input& input);
 void MSAMethod5(const Input& input, Output& output);
-
-void printOutput(const Output& output);
