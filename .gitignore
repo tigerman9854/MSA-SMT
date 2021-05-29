@@ -389,3 +389,6 @@ FodyWeavers.xsd
 
 # Include all third party data
 !MSA-SMT/Third_Party/**
+
+# Ignore the output folder
+/Output
