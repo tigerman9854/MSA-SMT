@@ -7,7 +7,7 @@ void encodeInput(Input& input)
     input.m = (int)input.rawInput.size();
 
     // Compute the length of each row
-    for (auto it : input.rawInput) {
+    for (const std::vector<char>& it : input.rawInput) {
         const int length = (int)it.size();
         input.n.push_back(length);
         input.blanks.push_back(input.k - length);

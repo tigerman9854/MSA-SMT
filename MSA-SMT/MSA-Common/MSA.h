@@ -15,32 +15,14 @@ struct Input {
 
 
 
-
-    // Encoded input
-    std::vector<std::vector<int>> encodedInput = {};
+    // Number of sequences
+    int m = 0;
 
     // Length of each sequence
     std::vector<int> n = {};
 
-    // Number of sequences
-    int m = 0;
-
-    int maxBlanks = 0;
-
     // Blanks in each sequence
     std::vector<int> blanks = {};
-
-    // Number of unique characters
-    int base = 0;
-
-    // Set of unique characters
-    std::set<char> uniqueChars = {};
-
-    // Encoding map
-    std::map<char, int> encoding = {};
-
-    // Decoding map
-    std::map<int, char> decoding = {};
 };
 
 struct Output {
