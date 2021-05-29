@@ -7,7 +7,9 @@ The tool formulates multiple sequence alignment (MSA) as a satisfiability modulo
 
 There is both a command line version and user interface version of this tool. The interfaces are pictured below:
 
-![](images/cmd-line.PNG) ![](images/ui.PNG)
+![](images/cmd-line.PNG)
+
+![](images/ui.PNG)![](images/completed.PNG)
 
 ## Pre-built Binaries
 Most users should just get the pre-built binaries found in [releases](https://github.com/tigerman9854/MSA-SMT/releases). Simply install the tool, and follow the instructions in the release.
