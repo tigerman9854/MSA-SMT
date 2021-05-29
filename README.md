@@ -47,4 +47,5 @@ This section is for developers.
 #### 4. Build
 1. Clone the repository.
 2. Open "MSA-SMT/MSA-SMT.sln" in Visual Studio 2019.
-3. Press F5 to build and run.
+3. Set "MSA-UI" as the startup project.
+4. Press F5 to build and run.
