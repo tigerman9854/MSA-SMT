@@ -11,7 +11,7 @@ struct Input {
     std::vector<std::vector<char>> rawInput = {};
 
     // Tight constraints
-    bool tightConstraints = false;
+    bool tightConstraints = true;
 
 
 

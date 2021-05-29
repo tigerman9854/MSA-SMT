@@ -12,13 +12,6 @@ void encodeInput(Input& input)
         input.n.push_back(length);
         input.blanks.push_back(input.k - length);
     }
-
-    // Compute unique chararcters
-    for (auto it : input.rawInput) {
-        for (char c : it) {
-            input.uniqueChars.insert(c);
-        }
-    }
 }
 
 void MSAMethod(const Input& input, Output& output)
