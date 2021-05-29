@@ -1,5 +1,5 @@
 # MSA-SMT
-A project for CS 517, Theory of Computation at Oregon State University.
+A project for Theory of Computation (CS 517) at Oregon State University.
 
 ## About
 MSA-SMT is a tool that aligns multiple sequences of DNA or RNA using the [Z3 Prover](https://github.com/Z3Prover/z3) as a backend. The tool formulates multiple sequence alignment (MSA) as a satisfiability modulo theory (SMT) problem which can be solved (somewhat efficiently) by Z3.
@@ -42,5 +42,5 @@ This section is for developers.
 
 #### 4. Build
 1. Clone the repository.
-2. Open "ModelViewer/ModelViewer/ModelViewer.sln" using Visual Studio 2019.
+2. Open "MSA-SMT/MSA-SMT.sln" in Visual Studio 2019.
 3. Press F5 to build and run.
