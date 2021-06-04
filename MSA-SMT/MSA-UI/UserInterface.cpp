@@ -80,6 +80,20 @@ UserInterface::UserInterface(QWidget* parent) : QMainWindow(parent)
 
     // Add default options
     QMenu* pLoadMenu = pMenuBar->addMenu("Load");
+    pLoadMenu->addAction("Paper Sample 1 (< 15 sec)", [=] {
+        pInputEdit->setText("TCACTGCGTCCCCGCAGGCCACTGA,\nCTACTGCGTCCCCCGCAGGTCACTGA,\nCCACTGGGTCGCCACAGGTCGGTGA");
+        pMaxLengthSpinBox->setValue(33);
+        pTightConstraintCheckBox->setChecked(true);
+        });
+
+    pLoadMenu->addAction("Paper Sample 2 (< 1 sec)", [=] {
+        pInputEdit->setText("TTTTTGATGCCCGTCAGGGCATGGAAGGCTACAC,\nTTTTTTATGCCCGTCAGGGCATGGAAGGCGACAC");
+        pMaxLengthSpinBox->setValue(36);
+        pTightConstraintCheckBox->setChecked(true);
+        });
+
+    pLoadMenu->addSeparator();
+
     pLoadMenu->addAction("Small Example (< 1 sec)", [=] {
         pInputEdit->setText("AAAGT,\nAAGT,\nAAAT");
         pMaxLengthSpinBox->setValue(5);
